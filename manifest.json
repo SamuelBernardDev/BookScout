@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Goodreads AI Book Recommender",
+  "version": "1.0",
+  "description": "An AI-powered extension for Goodreads that analyzes your reading history and preferences to provide tailored book recommendations.",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.goodreads.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.goodreads.com/*"
+      ],
+      "js": [
+        "content_script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [ "index.html" ],
+      "matches": [ "https://www.goodreads.com/*" ]
+    }
+  ],
+  "sandbox": {
+    "pages": [
+      "index.html"
+    ]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';",
+    "sandbox": "script-src 'self' https://cdn.tailwindcss.com https://esm.sh; style-src 'self' 'unsafe-inline';"
+  }
+}
