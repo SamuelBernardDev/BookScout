@@ -1,33 +1,57 @@
 async function fetchGoodreadsHistory() {
-  const apiKey = 'YOUR_GOODREADS_API_KEY';
-  const userId = 'YOUR_GOODREADS_USER_ID';
-  const url = `https://www.goodreads.com/review/list/${userId}.xml?key=${apiKey}&v=2`;
-  const res = await fetch(url);
-  const text = await res.text();
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, 'application/xml');
-  const titles = [...xml.querySelectorAll('review book title')].map(n => n.textContent);
-  return titles.join(', ');
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      if (!tab || !tab.url.includes('goodreads.com')) {
+        reject(new Error('Please open your Goodreads "My Books" page and try again.'));
+        return;
+      }
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tab.id },
+          func: () => {
+            return [...document.querySelectorAll('a.bookTitle span')]
+              .map(el => el.textContent)
+              .join(', ');
+          }
+        },
+        (results) => {
+          if (chrome.runtime.lastError || !results || !results[0].result) {
+            reject(new Error('Could not read Goodreads page.'));
+          } else {
+            resolve(results[0].result);
+          }
+        }
+      );
+    });
+  });
 }
 
-async function fetchRecommendations(description, history) {
-  const apiKey = 'YOUR_OPENAI_API_KEY';
-  const prompt = `Using the description: "${description}" and these read books: ${history || 'none'}, recommend 3 books. Respond in JSON array with fields title, review, amazon, goodreads.`;
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7
-    })
-  });
+function parseCSVTitles(text) {
+  return text
+    .split('\n')
+    .map(line => line.split(',')[0].trim())
+    .filter(Boolean)
+    .join(' ');
+}
+
+async function fetchRecommendations(description, history, csvBooks) {
+  const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
+  const queryParts = [description, history, csvBooks].filter(Boolean).join(' ');
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryParts)}&maxResults=3&key=${apiKey}`;
+  const res = await fetch(url);
   const data = await res.json();
-  const content = data.choices?.[0]?.message?.content;
-  return JSON.parse(content);
+  return (data.items || []).map(item => {
+    const info = item.volumeInfo;
+    const title = info.title;
+    const review = info.description || 'No description available.';
+    return {
+      title,
+      review,
+      amazon: `https://www.amazon.com/s?k=${encodeURIComponent(title)}`,
+      goodreads: `https://www.goodreads.com/search?q=${encodeURIComponent(title)}`
+    };
+  });
 }
 
 function renderRecommendations(list) {
@@ -63,11 +87,15 @@ document.getElementById('recommendForm').addEventListener('submit', async (e) =>
   e.preventDefault();
   const desc = document.getElementById('description').value;
   const useHistory = document.getElementById('useHistory').checked;
+  const file = document.getElementById('csvFile').files[0];
   const recommendationsEl = document.getElementById('recommendations');
   recommendationsEl.textContent = 'Loading...';
   try {
-    const history = useHistory ? await fetchGoodreadsHistory() : '';
-    const recs = await fetchRecommendations(desc, history);
+    const [history, csvBooks] = await Promise.all([
+      useHistory ? fetchGoodreadsHistory() : '',
+      file ? file.text().then(parseCSVTitles) : ''
+    ]);
+    const recs = await fetchRecommendations(desc, history, csvBooks);
     renderRecommendations(recs);
   } catch (err) {
     recommendationsEl.textContent = err.message;
