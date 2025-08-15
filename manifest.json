@@ -2,12 +2,10 @@
   "manifest_version": 3,
   "name": "BookScout",
   "version": "0.1.0",
-  "description": "Find book recommendations using AI and Goodreads history.",
-  "permissions": ["storage"],
+  "description": "Find book recommendations using Google Books and Goodreads history.",
+  "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
-    "https://api.openai.com/*",
-    "https://generativelanguage.googleapis.com/*",
-    "https://www.goodreads.com/*",
+    "https://www.googleapis.com/*",
     "https://www.amazon.com/*"
   ],
   "action": {
