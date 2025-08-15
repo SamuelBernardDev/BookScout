@@ -1,20 +1,15 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# BookScout Extension
 
-# Run and deploy your AI Studio app
+A Chrome extension that recommends books using AI and Goodreads history.
 
-This contains everything you need to run your app locally.
+## Development
 
-View your app in AI Studio: https://ai.studio/apps/drive/1ozP15_YM0DZbB5RD-82TGx9YZweSZC4i
+1. Add your OpenAI API key and Goodreads API credentials in `popup.js`.
+2. Load the extension in Chrome:
+   - Open `chrome://extensions`
+   - Enable **Developer Mode**
+   - Click **Load unpacked** and select this folder
 
-## Run Locally
+## Usage
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Describe what you'd like to read and optionally include your Goodreads history. The extension will list matching books with Amazon and Goodreads links.

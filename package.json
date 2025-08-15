@@ -1,21 +1,8 @@
 {
-  "name": "goodreads-ai-book-recommender",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "bookscout-extension",
+  "version": "0.1.0",
+  "description": "Chrome extension recommending books using AI and Goodreads history.",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "@google/genai": "^1.14.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "test": "echo \"No tests yet\""
   }
 }

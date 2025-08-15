@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>BookScout</title>
+  <style>
+    body { width: 300px; font-family: sans-serif; padding: 10px; }
+    textarea { width: 100%; }
+    .book { margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <h1>BookScout</h1>
+  <form id="recommendForm">
+    <label for="description">What would you like to read?</label>
+    <textarea id="description" rows="3" required></textarea>
+    <div>
+      <label><input type="checkbox" id="useHistory"/> Use Goodreads history</label>
+    </div>
+    <button type="submit">Search</button>
+  </form>
+  <div id="recommendations"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
