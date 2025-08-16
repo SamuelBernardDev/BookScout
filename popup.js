@@ -36,7 +36,7 @@ function parseCSVTitles(text) {
 }
 
 async function fetchRecommendations(description, history, csvBooks) {
-  const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
+  const apiKey = 'AIzaSyCjVa6PA6a7-f4hAkF5nSelisO1vBTnso0';
   const queryParts = [description, history, csvBooks].filter(Boolean).join(' ');
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryParts)}&maxResults=3&key=${apiKey}`;
   const res = await fetch(url);
