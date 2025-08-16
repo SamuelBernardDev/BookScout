@@ -37,8 +37,9 @@ function parseCSVTitles(text) {
     .join(' ');
 }
 
+
 async function fetchRecommendations(description, history, csvBooks, similarBooks = '') {
-  const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
+  const apiKey = 'AIzaSyCjVa6PA6a7-f4hAkF5nSelisO1vBTnso0';
   const queryParts = [description, history, csvBooks, similarBooks].filter(Boolean).join(' ');
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryParts)}&maxResults=3&key=${apiKey}`;
   const res = await fetch(url);
@@ -60,7 +61,7 @@ async function fetchRecommendations(description, history, csvBooks, similarBooks
 }
 
 async function searchSimilarBooks(query) {
-  const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
+  const apiKey = 'AIzaSyCjVa6PA6a7-f4hAkF5nSelisO1vBTnso0';
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5&key=${apiKey}`;
   const res = await fetch(url);
   const data = await res.json();
@@ -142,8 +143,10 @@ document.getElementById('recommendForm').addEventListener('submit', async (e) =>
       useHistory ? fetchGoodreadsHistory() : '',
       file ? file.text().then(parseCSVTitles) : ''
     ]);
+
     const similarQuery = selectedSimilarBooks.length ? selectedSimilarBooks.join(', ') : '';
     const recs = await fetchRecommendations(desc, history, csvBooks, similarQuery);
+
     renderRecommendations(recs);
   } catch (err) {
     recommendationsEl.textContent = err.message;
