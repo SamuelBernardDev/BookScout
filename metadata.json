@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Book Finder",
+  "description": "An elegant web application that leverages the Gemini API to provide personalized book recommendations based on user queries like genres, authors, or topics.",
+  "requestFramePermissions": []
+}

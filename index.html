@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini Book Finder</title>
+    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Gemini Book Finder</h1>
+        <p>Discover your next favorite book with the power of AI.</p>
+      </header>
+      
+      <form id="recommendForm">
+        <div>
+          <label for="description">What would you like to read about?</label>
+          <textarea id="description" rows="3" required placeholder="e.g., A sci-fi adventure on a distant planet with a witty robot sidekick."></textarea>
+        </div>
+        
+        <div>
+          <label for="csvFile">Upload a CSV of books you've read (optional)</label>
+          <input type="file" id="csvFile" accept=".csv" />
+        </div>
+
+        <div>
+          <label for="similarBookInput">Or add books you've read that are similar</label>
+          <div id="selectedBooksContainer"></div>
+          <input type="text" id="similarBookInput" placeholder="Type a title to search..." />
+          <div id="similarBooksResults"></div>
+        </div>
+        
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+          Find Books
+        </button>
+      </form>
+      
+      <div id="recommendations"></div>
+    </div>
+    <script type="module" src="/index.js"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
