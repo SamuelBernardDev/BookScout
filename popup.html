@@ -6,7 +6,8 @@
   <style>
     body { width: 300px; font-family: sans-serif; padding: 10px; }
     textarea { width: 100%; }
-    .book { margin-bottom: 12px; }
+    .book { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #ccc; }
+    #similarBooksResults label { display: block; }
   </style>
 </head>
 <body>
@@ -20,6 +21,11 @@
     <div>
       <label for="csvFile">Upload CSV of your books</label>
       <input type="file" id="csvFile" accept=".csv" />
+    </div>
+    <div>
+      <label for="similarBookInput">Books I've read that are similar</label>
+      <input type="text" id="similarBookInput" placeholder="Type a title" />
+      <div id="similarBooksResults"></div>
     </div>
     <button type="submit">Search</button>
   </form>

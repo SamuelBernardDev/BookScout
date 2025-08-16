@@ -1,3 +1,5 @@
+const selectedSimilarBooks = [];
+
 async function fetchGoodreadsHistory() {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -35,22 +37,59 @@ function parseCSVTitles(text) {
     .join(' ');
 }
 
-async function fetchRecommendations(description, history, csvBooks) {
+async function fetchRecommendations(description, history, csvBooks, similarBooks = '') {
   const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
-  const queryParts = [description, history, csvBooks].filter(Boolean).join(' ');
+  const queryParts = [description, history, csvBooks, similarBooks].filter(Boolean).join(' ');
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryParts)}&maxResults=3&key=${apiKey}`;
   const res = await fetch(url);
   const data = await res.json();
   return (data.items || []).map(item => {
     const info = item.volumeInfo;
     const title = info.title;
-    const review = info.description || 'No description available.';
+    const desc = info.description || 'No description available.';
+    const review = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '...' : desc;
     return {
       title,
       review,
+      rating: info.averageRating || null,
+      ratingsCount: info.ratingsCount || 0,
       amazon: `https://www.amazon.com/s?k=${encodeURIComponent(title)}`,
       goodreads: `https://www.goodreads.com/search?q=${encodeURIComponent(title)}`
     };
+  });
+}
+
+async function searchSimilarBooks(query) {
+  const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5&key=${apiKey}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return (data.items || []).map(item => item.volumeInfo.title);
+}
+
+function renderSimilarBookResults(titles) {
+  const container = document.getElementById('similarBooksResults');
+  container.innerHTML = '';
+  titles.forEach(title => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = title;
+    checkbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!selectedSimilarBooks.includes(title)) {
+          selectedSimilarBooks.push(title);
+        }
+      } else {
+        const idx = selectedSimilarBooks.indexOf(title);
+        if (idx !== -1) {
+          selectedSimilarBooks.splice(idx, 1);
+        }
+      }
+    });
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(' ' + title));
+    container.appendChild(label);
   });
 }
 
@@ -64,6 +103,13 @@ function renderRecommendations(list) {
     title.textContent = b.title;
     const review = document.createElement('p');
     review.textContent = b.review;
+    const rating = document.createElement('p');
+    if (b.rating) {
+      const stars = '★'.repeat(Math.round(b.rating)) + '☆'.repeat(5 - Math.round(b.rating));
+      rating.textContent = `${stars} (${b.rating.toFixed(1)} / 5 from ${b.ratingsCount} reviews)`;
+    } else {
+      rating.textContent = 'No rating available.';
+    }
     const links = document.createElement('p');
     const amazon = document.createElement('a');
     amazon.href = b.amazon;
@@ -78,6 +124,7 @@ function renderRecommendations(list) {
     links.appendChild(goodreads);
     div.appendChild(title);
     div.appendChild(review);
+    div.appendChild(rating);
     div.appendChild(links);
     container.appendChild(div);
   });
@@ -95,9 +142,20 @@ document.getElementById('recommendForm').addEventListener('submit', async (e) =>
       useHistory ? fetchGoodreadsHistory() : '',
       file ? file.text().then(parseCSVTitles) : ''
     ]);
-    const recs = await fetchRecommendations(desc, history, csvBooks);
+    const similarQuery = selectedSimilarBooks.length ? selectedSimilarBooks.join(', ') : '';
+    const recs = await fetchRecommendations(desc, history, csvBooks, similarQuery);
     renderRecommendations(recs);
   } catch (err) {
     recommendationsEl.textContent = err.message;
   }
+});
+
+document.getElementById('similarBookInput').addEventListener('input', async (e) => {
+  const query = e.target.value.trim();
+  if (query.length < 3) {
+    document.getElementById('similarBooksResults').innerHTML = '';
+    return;
+  }
+  const titles = await searchSimilarBooks(query);
+  renderSimilarBookResults(titles);
 });
