@@ -60,7 +60,7 @@ async function fetchRecommendations(description, history, csvBooks) {
 }
 
 async function searchSimilarBooks(query) {
-  const apiKey = 'YOUR_GOOGLE_BOOKS_API_KEY';
+  const apiKey = 'AIzaSyCjVa6PA6a7-f4hAkF5nSelisO1vBTnso0';
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5&key=${apiKey}`;
   const res = await fetch(url);
   const data = await res.json();
