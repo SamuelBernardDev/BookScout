@@ -37,7 +37,8 @@ function parseCSVTitles(text) {
     .join(' ');
 }
 
-async function fetchRecommendations(description, history, csvBooks) {
+
+async function fetchRecommendations(description, history, csvBooks, similarBooks = '') {
   const apiKey = 'AIzaSyCjVa6PA6a7-f4hAkF5nSelisO1vBTnso0';
   const queryParts = [description, history, csvBooks, similarBooks].filter(Boolean).join(' ');
   const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryParts)}&maxResults=3&key=${apiKey}`;
@@ -142,7 +143,10 @@ document.getElementById('recommendForm').addEventListener('submit', async (e) =>
       useHistory ? fetchGoodreadsHistory() : '',
       file ? file.text().then(parseCSVTitles) : ''
     ]);
-    const recs = await fetchRecommendations(desc, history, csvBooks, selectedSimilarBooks.join(', '));
+
+    const similarQuery = selectedSimilarBooks.length ? selectedSimilarBooks.join(', ') : '';
+    const recs = await fetchRecommendations(desc, history, csvBooks, similarQuery);
+
     renderRecommendations(recs);
   } catch (err) {
     recommendationsEl.textContent = err.message;
